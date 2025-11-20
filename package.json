@@ -1,0 +1,12 @@
+{
+  "name": "meta-whatsapp-webhook",
+  "version": "1.0.0",
+  "description": "Node.js Express webhook for Meta/WhatsApp.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
