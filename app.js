@@ -1,15 +1,13 @@
 const express = require('express');
-const crypto = require('crypto');
 const app = express();
 
-// Meta envía el cuerpo como un buffer crudo para validar la firma
-app.use(express.json({
-    verify: (req, res, buf) => {
-        req.rawBody = buf;
-    }
-}));
+// IMPORTANTE: Usa process.env.PORT, si no existe usa 3000 por defecto
+const port = process.env.PORT || 3000;
 
-// 1. GET (Verificación) - Ya lo tienes bien
+app.use(express.json());
+
+app.get('/', (req, res) => res.send('Servidor Webhook Activo'));
+
 app.get('/webhook', (req, res) => {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
@@ -22,16 +20,12 @@ app.get('/webhook', (req, res) => {
     }
 });
 
-// 2. POST (Recepción con validación de firma)
 app.post('/webhook', (req, res) => {
-    const signature = req.headers['x-hub-signature-256'];
-    const hmac = crypto.createHmac('sha256', process.env.APP_SECRET);
-    const digest = 'sha256=' + hmac.update(req.rawBody).digest('hex');
-
-    if (signature !== digest) {
-        return res.sendStatus(403); // Firma inválida
-    }
-
-    console.log('Evento validado:', JSON.stringify(req.body, null, 2));
+    console.log('Evento recibido');
     res.status(200).send('EVENT_RECEIVED');
+});
+
+// ESCUCHA EN EL PUERTO QUE RENDER TE ASIGNE
+app.listen(port, '0.0.0.0', () => {
+    console.log('Servidor escuchando en el puerto ' + port);
 });
